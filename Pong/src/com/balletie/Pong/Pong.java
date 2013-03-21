@@ -12,13 +12,15 @@ import com.badlogic.gdx.math.*;
 public class Pong implements ApplicationListener {
 /// Fields	
 	public static final String VERSION = "1.0.0";
-	private Rectangle field = new Rectangle();
+	public Menu mainMenu;
+	protected static Rectangle field = new Rectangle();
 	private Ball ball = new Ball();
 	private Paddle paddle1 = new Paddle(), paddle2 = new Paddle();
 	private ShapeRenderer shapeRenderer;
 	private float fieldTop, fieldBottom, fieldRight, fieldLeft;
-	BitmapFont white;
-	SpriteBatch spriteBatch;
+	public static BitmapFont white;
+	public static SpriteBatch spriteBatch;
+	public static boolean play = false;
 	int Player1;
 	int Player2;
 	boolean score1 = false;
@@ -26,12 +28,13 @@ public class Pong implements ApplicationListener {
 	CharSequence cPlayer1;
 	CharSequence cPlayer2;
 	CharSequence str;
+	CharSequence option1 = "Play";
 	float textCorrect = 84;
 	float initVelocity = 400f;
 	float currentVelocity = initVelocity;
-	private GameState currentState = GameState.NEW;
+	protected static GameState currentState = GameState.NEW;
 	
-	private enum GameState {
+	protected enum GameState {
 		NEW,
 		RESET,
 		PLAY,
@@ -45,6 +48,7 @@ public class Pong implements ApplicationListener {
 		fieldBottom = field.y;
 		fieldTop = field.y + field.height;
 		
+//		mainMenu = new Menu();
 		shapeRenderer = new ShapeRenderer();
 		spriteBatch = new SpriteBatch();
 		white = new BitmapFont(Gdx.files.internal("data/pongfont.fnt"), Gdx.files.internal("data/pongfont.png"), false);
@@ -55,13 +59,22 @@ public class Pong implements ApplicationListener {
 	@Override
 	public void dispose() {
 		white.dispose();
+//		mainMenu.dispose();
 	}
 
 	@Override
 	public void render() {		
 		float dt = Gdx.graphics.getRawDeltaTime();
-		update(dt);
-		draw(dt);
+		Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
+		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
+		Menu.drawMenu(dt);
+		if (play) {
+			Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
+			Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
+			update(dt);
+			draw(dt);
+//			System.out.println("works.");
+		}
 	}
 
 	@Override
@@ -90,8 +103,6 @@ public class Pong implements ApplicationListener {
 	}
 	
 	private void draw(float dt){
-		Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
-		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 		
 		CharSequence cPlayer1 = String.valueOf(Player1);
 		CharSequence cPlayer2 = String.valueOf(Player2);
@@ -149,7 +160,6 @@ public class Pong implements ApplicationListener {
 		} else if(Gdx.input.isKeyPressed(Input.Keys.R)) {
 			currentState = GameState.RESET;
 		}
-
 	}
 	
 	private void newGame() {
