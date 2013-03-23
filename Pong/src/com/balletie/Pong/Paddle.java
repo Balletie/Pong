@@ -5,7 +5,4 @@ public class Paddle extends GameObject{
 	public Paddle() {
 		super(32, 96);
 	}
-
-	
-	
 }

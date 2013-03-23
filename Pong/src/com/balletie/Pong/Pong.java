@@ -11,16 +11,16 @@ import com.badlogic.gdx.math.*;
 
 public class Pong implements ApplicationListener {
 /// Fields	
-	public static final String VERSION = "1.0.0";
+	public static final String VERSION = "1.1.0";
+	public Rectangle field;
 	public Menu mainMenu;
-	protected static Rectangle field = new Rectangle();
 	private Ball ball = new Ball();
 	private Paddle paddle1 = new Paddle(), paddle2 = new Paddle();
 	private ShapeRenderer shapeRenderer;
-	private float fieldTop, fieldBottom, fieldRight, fieldLeft;
-	public static BitmapFont white;
-	public static SpriteBatch spriteBatch;
-	public static boolean play = false;
+	public float fieldTop, fieldBottom, fieldRight, fieldLeft;
+	public BitmapFont white;
+	public SpriteBatch spriteBatch;
+	public boolean play = false;
 	int Player1;
 	int Player2;
 	boolean score1 = false;
@@ -28,11 +28,10 @@ public class Pong implements ApplicationListener {
 	CharSequence cPlayer1;
 	CharSequence cPlayer2;
 	CharSequence str;
-	CharSequence option1 = "Play";
 	float textCorrect = 84;
 	float initVelocity = 400f;
 	float currentVelocity = initVelocity;
-	protected static GameState currentState = GameState.NEW;
+	protected GameState currentState = GameState.NEW;
 	
 	protected enum GameState {
 		NEW,
@@ -42,16 +41,19 @@ public class Pong implements ApplicationListener {
 	
 	@Override
 	public void create() {		
+//		Gdx.graphics.setContinuousRendering(false);
+//		Gdx.graphics.requestRendering();
+		field = new Rectangle();
 		field.set(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		fieldLeft = field.x;
 		fieldRight = field.x + field.width;
 		fieldBottom = field.y;
 		fieldTop = field.y + field.height;
 		
-//		mainMenu = new Menu();
 		shapeRenderer = new ShapeRenderer();
 		spriteBatch = new SpriteBatch();
 		white = new BitmapFont(Gdx.files.internal("data/pongfont.fnt"), Gdx.files.internal("data/pongfont.png"), false);
+		mainMenu = new Menu(spriteBatch, white, field);
 		newGame();
 		reset();
 	}
@@ -67,14 +69,14 @@ public class Pong implements ApplicationListener {
 		float dt = Gdx.graphics.getRawDeltaTime();
 		Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
-		Menu.drawMenu(dt);
-		if (play) {
+		mainMenu.drawMenu();
+		if (mainMenu.newGame()) {
 			Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
 			Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 			update(dt);
 			draw(dt);
-//			System.out.println("works.");
 		}
+//		Gdx.graphics.requestRendering();
 	}
 
 	@Override
