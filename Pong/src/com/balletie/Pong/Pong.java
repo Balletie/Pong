@@ -3,6 +3,7 @@ package com.balletie.Pong;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.FPSLogger;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -10,17 +11,21 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.*;
 
 public class Pong implements ApplicationListener {
-/// Fields	
+//	Fields	
 	public static final String VERSION = "1.1.0";
 	public Rectangle field;
-	public Menu mainMenu;
+	protected Menu mainMenu;
+	private About aboutScreen;
 	private Ball ball = new Ball();
 	private Paddle paddle1 = new Paddle(), paddle2 = new Paddle();
 	private ShapeRenderer shapeRenderer;
+	private FPSLogger fpsLogger;
 	public float fieldTop, fieldBottom, fieldRight, fieldLeft;
 	public BitmapFont white;
 	public SpriteBatch spriteBatch;
+	public boolean menu = true;
 	public boolean play = false;
+	public boolean about = false;
 	int Player1;
 	int Player2;
 	boolean score1 = false;
@@ -28,10 +33,11 @@ public class Pong implements ApplicationListener {
 	CharSequence cPlayer1;
 	CharSequence cPlayer2;
 	CharSequence str;
-	float textCorrect = 84;
+	float textCorrect = 84f;
 	float initVelocity = 400f;
 	float currentVelocity = initVelocity;
 	protected GameState currentState = GameState.NEW;
+	public MenuSwitch currentMenu = MenuSwitch.MAIN;
 	
 	protected enum GameState {
 		NEW,
@@ -39,10 +45,14 @@ public class Pong implements ApplicationListener {
 		PLAY,
 	}
 	
+	protected enum MenuSwitch{
+		MAIN,
+		PLAY,
+		ABOUT,
+	}
+	
 	@Override
-	public void create() {		
-//		Gdx.graphics.setContinuousRendering(false);
-//		Gdx.graphics.requestRendering();
+	public void create() {
 		field = new Rectangle();
 		field.set(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		fieldLeft = field.x;
@@ -53,7 +63,9 @@ public class Pong implements ApplicationListener {
 		shapeRenderer = new ShapeRenderer();
 		spriteBatch = new SpriteBatch();
 		white = new BitmapFont(Gdx.files.internal("data/pongfont.fnt"), Gdx.files.internal("data/pongfont.png"), false);
-		mainMenu = new Menu(spriteBatch, white, field);
+		mainMenu = new Menu(spriteBatch, white, field, currentMenu);
+		aboutScreen = new About(spriteBatch, white, field, currentMenu);
+		fpsLogger = new FPSLogger();
 		newGame();
 		reset();
 	}
@@ -61,22 +73,55 @@ public class Pong implements ApplicationListener {
 	@Override
 	public void dispose() {
 		white.dispose();
-//		mainMenu.dispose();
+		spriteBatch.dispose();
+		shapeRenderer.dispose();
 	}
 
 	@Override
 	public void render() {		
-		float dt = Gdx.graphics.getRawDeltaTime();
-		Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
-		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
-		mainMenu.drawMenu();
-		if (mainMenu.newGame()) {
+		float dt = Gdx.graphics.getDeltaTime();
+		if(mainMenu.about(currentMenu) == MenuSwitch.ABOUT){
+			currentMenu = MenuSwitch.ABOUT;
+		} else if(mainMenu.newGame(currentMenu) == MenuSwitch.PLAY){
+			currentMenu = MenuSwitch.PLAY;
+		} else if(aboutScreen.draw(currentMenu) == MenuSwitch.MAIN){
+			currentMenu = MenuSwitch.MAIN;
+		}
+		switch(currentMenu) {
+		case MAIN:
+			Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
+			Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
+			mainMenu.drawMenu();
+			break;
+		case PLAY:
 			Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
 			Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 			update(dt);
 			draw(dt);
+			fpsLogger.log();
+			break;
+		case ABOUT:
+			Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
+			Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
+			aboutScreen.draw(currentMenu);
+			break;
 		}
-//		Gdx.graphics.requestRendering();
+//		if (menu) {
+//			Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
+//			Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
+//			mainMenu.drawMenu();
+//		} else if (mainMenu.newGame()) {
+//			Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
+//			Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
+//			update(dt);
+//			draw(dt);
+//			fpsLogger.log();
+//		} else if (mainMenu.about()) {
+//			menu = false;
+//			Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
+//			Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
+//			aboutScreen.draw();
+//		}
 	}
 
 	@Override
@@ -108,7 +153,6 @@ public class Pong implements ApplicationListener {
 		
 		CharSequence cPlayer1 = String.valueOf(Player1);
 		CharSequence cPlayer2 = String.valueOf(Player2);
-//		CharSequence str = cPlayer1 + " " + cPlayer2;
 
 		spriteBatch.begin();
 			white.setColor(1.0f, 1.0f, 1.0f, 1.0f);
@@ -150,15 +194,14 @@ public class Pong implements ApplicationListener {
 			updatePaddle2(dt);
 			break;
 		}
-		
-//		updateScore();
 	}
 
 	private void handleInput() {
 		if(Gdx.input.isKeyPressed(Input.Keys.N)) {
 			currentState = GameState.NEW;
 		} else if(Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
-			Gdx.app.exit();
+//			Gdx.app.exit();
+			currentMenu = MenuSwitch.MAIN;
 		} else if(Gdx.input.isKeyPressed(Input.Keys.R)) {
 			currentState = GameState.RESET;
 		}
@@ -173,16 +216,6 @@ public class Pong implements ApplicationListener {
 		
 		ball.integrate(dt);
 		ball.updateBounds();
-		
-//		if(ball.right() < paddle2.left() && ball.getY() > paddle2.getY() && ball.getHeight() < paddle2.getHeight()) {
-//			ball.move(paddle2.left() - ball.getWidth(), ball.getY());
-//			ball.reflect(true, false);
-//		}
-//		
-//		if(ball.left() < paddle1.right() && ball.getY() > paddle1.getY() && ball.getHeight() < paddle1.getHeight()) {
-//			ball.move(paddle1.right(), ball.getY());
-//			ball.reflect(true, false);
-//		}
 		
 		//Field collision
 		if(ball.left() < fieldLeft) {
@@ -256,14 +289,6 @@ public class Pong implements ApplicationListener {
 		}
 		
 	}
-	
-//	public void onCollision(boolean paddleReflect, boolean boundReflect, float currentVelocity){
-//		if(paddleReflect){
-//			Vector2 velocity = ball.getVelocity();
-//			currentVelocity = currentVelocity * .1f;
-//			velocity.set(currentVelocity, 0f);
-//		}
-//	}
 	
 	private void updatePaddle1(float dt) {
 		boolean moveDown = false, moveUp = false;

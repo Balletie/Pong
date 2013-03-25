@@ -1,7 +1,7 @@
 TODO:
 
 Implement sound effects and music.
-Create a basic UI with the options:
-	New Game
-	(Options?)
-	About
+Touch support for paddles.
+Fix the stuttering:
+	Rewrite for using Pixmap or a texture instead of ShapeRenderer, which is "more oriented 
+		towards debugging" instead of performance.
