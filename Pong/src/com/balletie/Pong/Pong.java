@@ -12,10 +12,10 @@ import com.badlogic.gdx.math.*;
 
 public class Pong implements ApplicationListener {
 //	Fields	
-	public static final String VERSION = "1.1.0";
+	public static final String VERSION = "1.1.1";
 	public Rectangle field;
 	protected Menu mainMenu;
-	private About aboutScreen;
+	protected About aboutScreen;
 	private Ball ball = new Ball();
 	private Paddle paddle1 = new Paddle(), paddle2 = new Paddle();
 	private ShapeRenderer shapeRenderer;
@@ -84,7 +84,8 @@ public class Pong implements ApplicationListener {
 			currentMenu = MenuSwitch.ABOUT;
 		} else if(mainMenu.newGame(currentMenu) == MenuSwitch.PLAY){
 			currentMenu = MenuSwitch.PLAY;
-		} else if(aboutScreen.draw(currentMenu) == MenuSwitch.MAIN){
+		}
+		if (aboutScreen.aboutInput(currentMenu) == MenuSwitch.MAIN){
 			currentMenu = MenuSwitch.MAIN;
 		}
 		switch(currentMenu) {
@@ -103,25 +104,9 @@ public class Pong implements ApplicationListener {
 		case ABOUT:
 			Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
 			Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
-			aboutScreen.draw(currentMenu);
+			aboutScreen.drawAbout();
 			break;
 		}
-//		if (menu) {
-//			Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
-//			Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
-//			mainMenu.drawMenu();
-//		} else if (mainMenu.newGame()) {
-//			Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
-//			Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
-//			update(dt);
-//			draw(dt);
-//			fpsLogger.log();
-//		} else if (mainMenu.about()) {
-//			menu = false;
-//			Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
-//			Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
-//			aboutScreen.draw();
-//		}
 	}
 
 	@Override
@@ -199,8 +184,7 @@ public class Pong implements ApplicationListener {
 	private void handleInput() {
 		if(Gdx.input.isKeyPressed(Input.Keys.N)) {
 			currentState = GameState.NEW;
-		} else if(Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
-//			Gdx.app.exit();
+		} else if(Gdx.input.isKeyPressed(Input.Keys.ESCAPE) || Gdx.input.isKeyPressed(Input.Keys.P)) {
 			currentMenu = MenuSwitch.MAIN;
 		} else if(Gdx.input.isKeyPressed(Input.Keys.R)) {
 			currentState = GameState.RESET;
@@ -219,14 +203,10 @@ public class Pong implements ApplicationListener {
 		
 		//Field collision
 		if(ball.left() < fieldLeft) {
-//			ball.move(fieldLeft, ball.getY());
-//			ball.reflect(true, false);
 			score(true, false);
 		}
 		
 		if(ball.right() > fieldRight) {
-//			ball.move(fieldRight - ball.getWidth(), ball.getY());
-//			ball.reflect(true, false);
 			score(false, true);
 		}
 		

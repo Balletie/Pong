@@ -8,7 +8,9 @@ import com.badlogic.gdx.math.Rectangle;
 
 public class About extends Pong {
 
-	private CharSequence aboutRule1 = "This is a clone of the game Pong.";
+	CharSequence aboutRule1 = "This is a clone of the game Pong, made by Balletie";
+	CharSequence aboutRule2 = "The source code for this game is available at:";
+	CharSequence aboutRule3 = "http://github.com/Balletie/Pong";
 	
 	About(SpriteBatch spriteBatch, BitmapFont white, Rectangle field, MenuSwitch currentMenu) {
 		this.spriteBatch = spriteBatch;
@@ -17,16 +19,23 @@ public class About extends Pong {
 		this.currentMenu = currentMenu;
 	}
 
-	MenuSwitch draw(MenuSwitch currentMenu) {
+	public void drawAbout() {
 		spriteBatch.begin();
-			white.draw(spriteBatch, aboutRule1, field.width / 2 - 284f, 500f);
+			white.setColor(1.0f, 1.0f, 1.0f, 1.0f);
+			white.setScale(1, 1);
+			white.draw(spriteBatch, aboutRule1, 100f, 500f);
+			white.draw(spriteBatch, aboutRule2, 100f, 468f);
+			white.draw(spriteBatch, aboutRule3, 100f, 436f);
 		spriteBatch.end();
-		if ( Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
-//			Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
-//			Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
+		
+		aboutInput(currentMenu);
+	}
+
+	MenuSwitch aboutInput(MenuSwitch currentMenu) {
+		if (   Gdx.input.isKeyPressed(Input.Keys.ESCAPE) 
+			|| Gdx.input.isKeyPressed(Input.Keys.BACKSPACE)) {
 			currentMenu = MenuSwitch.MAIN;
 		}
-//		return menu;
 		return currentMenu;
 	}
 }

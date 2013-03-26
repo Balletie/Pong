@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 
 public class Menu extends Pong {
+	
 	private float opt1BoxLeft;
 	private float opt1BoxRight;
 	private float opt1BoxBottom;
@@ -18,6 +19,7 @@ public class Menu extends Pong {
 	private float opt3BoxRight;
 	private float opt3BoxBottom;
 	private float opt3BoxTop;
+	CharSequence title = "PONG!";
 	CharSequence option1 = "Play";
 	CharSequence option2 = "About";
 	CharSequence option3 = "Exit";
@@ -31,12 +33,12 @@ public class Menu extends Pong {
 		opt1BoxRight = field.width / 2 + 32f;
 		opt1BoxBottom = field.height / 2 - 32f;
 		opt1BoxTop = field.height / 2;
-		opt2BoxLeft = field.width / 2 - 40f;
-		opt2BoxRight = field.width / 2 + 40f;
+		opt2BoxLeft = field.width / 2 - 46f;
+		opt2BoxRight = field.width / 2 + 46f;
 		opt2BoxBottom = field.height / 2 - 72f;
 		opt2BoxTop = field.height / 2 - 40f;
-		opt3BoxLeft = field.width / 2 - 32f;
-		opt3BoxRight = field.width / 2 + 32f;
+		opt3BoxLeft = field.width / 2 - 26f;
+		opt3BoxRight = field.width / 2 + 26f;
 		opt3BoxBottom = field.height / 2 - 112;
 		opt3BoxTop = field.height / 2 - 80f;
 	}
@@ -44,6 +46,8 @@ public class Menu extends Pong {
 	public void drawMenu() {
 		spriteBatch.begin();
 			white.setColor(1.0f, 1.0f, 1.0f, 1.0f);
+			white.setScale(3, 3);
+			white.draw(spriteBatch, title, field.width / 2 - 127f, field.height - 75f);
 			white.setScale(1, 1);
 			white.draw(spriteBatch, option1, opt1BoxLeft, opt1BoxTop);
 			white.draw(spriteBatch, option2, opt2BoxLeft, opt2BoxTop);
@@ -54,12 +58,11 @@ public class Menu extends Pong {
 		exit();
 	}
 
-
 	MenuSwitch newGame(MenuSwitch currentMenu) {
 		if (   Gdx.input.justTouched()
-				&& Gdx.input.getX() < opt1BoxRight && Gdx.input.getX() > opt1BoxLeft 
-				&& Gdx.graphics.getHeight() - Gdx.input.getY() < opt1BoxTop 
-				&& Gdx.graphics.getHeight() - Gdx.input.getY() > opt1BoxBottom) {
+			&& Gdx.input.getX() < opt1BoxRight && Gdx.input.getX() > opt1BoxLeft 
+			&& Gdx.graphics.getHeight() - Gdx.input.getY() < opt1BoxTop 
+			&& Gdx.graphics.getHeight() - Gdx.input.getY() > opt1BoxBottom) {
 			currentMenu = MenuSwitch.PLAY;
 		}
 		return currentMenu;
@@ -77,9 +80,9 @@ public class Menu extends Pong {
 
 	private void exit() {
 		if (   Gdx.input.justTouched()
-				&& Gdx.input.getX() < opt3BoxRight && Gdx.input.getX() > opt3BoxLeft 
-				&& Gdx.graphics.getHeight() - Gdx.input.getY() < opt3BoxTop
-				&& Gdx.graphics.getHeight() - Gdx.input.getY() > opt3BoxBottom) {
+			&& Gdx.input.getX() < opt3BoxRight && Gdx.input.getX() > opt3BoxLeft 
+			&& Gdx.graphics.getHeight() - Gdx.input.getY() < opt3BoxTop
+			&& Gdx.graphics.getHeight() - Gdx.input.getY() > opt3BoxBottom) {
 			Gdx.app.exit();
 		}
 	}
