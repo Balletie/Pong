@@ -72,9 +72,6 @@ public class Pong implements ApplicationListener {
 		background_music = Gdx.audio.newMusic(Gdx.files.internal("data/Seablue_-_02_-_Aurora_Dawn.mp3"));
 		ball_bump = Gdx.audio.newSound(Gdx.files.internal("data/ball_bump.wav"));
 		ball_score = Gdx.audio.newSound(Gdx.files.internal("data/ball_score.wav"));
-//		background_music.setVolume(0.7f);
-//		background_music.setLooping(true);
-//		background_music.play();
 		soundOfMusic = new Audio(ball_bump, ball_bump, background_music);
 		soundOfMusic.backgroundMusic(background_music);
 		mainMenu = new Menu(spriteBatch, white, field, currentMenu);

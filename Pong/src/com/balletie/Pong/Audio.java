@@ -12,7 +12,6 @@ public class Audio extends Pong{
 	}
 	
 	public void backgroundMusic(Music background_music) {
-//		background_music = Gdx.audio.newMusic(Gdx.files.internal("data/Seablue_-_02_-_Aurora_Dawn.mp3"));
 		background_music.setVolume(0.7f);
 		background_music.setLooping(true);
 		background_music.play();
