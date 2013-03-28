@@ -3,6 +3,8 @@ package com.balletie.Pong;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.FPSLogger;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -12,7 +14,7 @@ import com.badlogic.gdx.math.*;
 
 public class Pong implements ApplicationListener {
 //	Fields	
-	public static final String VERSION = "1.1.1";
+	public static final String VERSION = "1.2.0";
 	public Rectangle field;
 	protected Menu mainMenu;
 	protected About aboutScreen;
@@ -23,6 +25,10 @@ public class Pong implements ApplicationListener {
 	public float fieldTop, fieldBottom, fieldRight, fieldLeft;
 	public BitmapFont white;
 	public SpriteBatch spriteBatch;
+	public Music background_music;
+	public Sound ball_bump;
+	public Sound ball_score;
+	protected Audio soundOfMusic;
 	public boolean menu = true;
 	public boolean play = false;
 	public boolean about = false;
@@ -63,6 +69,14 @@ public class Pong implements ApplicationListener {
 		shapeRenderer = new ShapeRenderer();
 		spriteBatch = new SpriteBatch();
 		white = new BitmapFont(Gdx.files.internal("data/pongfont.fnt"), Gdx.files.internal("data/pongfont.png"), false);
+		background_music = Gdx.audio.newMusic(Gdx.files.internal("data/Seablue_-_02_-_Aurora_Dawn.mp3"));
+		ball_bump = Gdx.audio.newSound(Gdx.files.internal("data/ball_bump.wav"));
+		ball_score = Gdx.audio.newSound(Gdx.files.internal("data/ball_score.wav"));
+//		background_music.setVolume(0.7f);
+//		background_music.setLooping(true);
+//		background_music.play();
+		soundOfMusic = new Audio(ball_bump, ball_bump, background_music);
+		soundOfMusic.backgroundMusic(background_music);
 		mainMenu = new Menu(spriteBatch, white, field, currentMenu);
 		aboutScreen = new About(spriteBatch, white, field, currentMenu);
 		fpsLogger = new FPSLogger();
@@ -72,6 +86,9 @@ public class Pong implements ApplicationListener {
 
 	@Override
 	public void dispose() {
+		background_music.dispose();
+		ball_bump.dispose();
+		ball_score.dispose();
 		white.dispose();
 		spriteBatch.dispose();
 		shapeRenderer.dispose();
@@ -204,20 +221,24 @@ public class Pong implements ApplicationListener {
 		//Field collision
 		if(ball.left() < fieldLeft) {
 			score(true, false);
+			Audio.ballScore(ball_score);
 		}
 		
 		if(ball.right() > fieldRight) {
 			score(false, true);
+			Audio.ballScore(ball_score);
 		}
 		
 		if(ball.bottom() < fieldBottom) {
 			ball.move(ball.getX(), fieldBottom);
 			ball.reflect(false, true);
+			Audio.ballBump(ball_bump);
 		}
 		
 		if(ball.top() > fieldTop) {
 			ball.move(ball.getX(), fieldTop - ball.getHeight());
 			ball.reflect(false, true);
+			Audio.ballBump(ball_bump);
 		}
 		
 		//Paddle collision
@@ -242,6 +263,8 @@ public class Pong implements ApplicationListener {
 				velocity.setAngle(angle);
 				ball.setVelocity(velocity);
 				System.out.println("Paddle1: " + angle + " - " + currentVelocity);
+				
+				Audio.ballBump(ball_bump);
 			}
 		} else if(ball.getBounds().overlaps(paddle2.getBounds())) {
 			if(ball.right() > paddle2.left() && ball.left() < paddle2.left()){
@@ -265,6 +288,8 @@ public class Pong implements ApplicationListener {
 				velocity.setAngle(180f - angle);
 				ball.setVelocity(velocity);
 				System.out.println("Paddle2: " + angle + " - " + currentVelocity);
+				
+				Audio.ballBump(ball_bump);
 			}
 		}
 		

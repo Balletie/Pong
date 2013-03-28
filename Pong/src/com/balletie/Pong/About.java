@@ -8,7 +8,7 @@ import com.badlogic.gdx.math.Rectangle;
 
 public class About extends Pong {
 
-	CharSequence aboutRule1 = "This is a clone of the game Pong, made by Balletie";
+	CharSequence aboutRule1 = "This is a clone of the game Pong, made by Balletie.";
 	CharSequence aboutRule2 = "The source code for this game is available at:";
 	CharSequence aboutRule3 = "http://github.com/Balletie/Pong";
 	
