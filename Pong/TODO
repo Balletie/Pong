@@ -1,6 +1,9 @@
 TODO:
 
-Touch support for paddles.
+Add touch support.
+
 Fix the stuttering:
 	Rewrite for using Pixmap or a texture instead of ShapeRenderer, which is "more oriented 
 		towards debugging" instead of performance.
+		
+		EDIT: Done that, but it's still stuttering.

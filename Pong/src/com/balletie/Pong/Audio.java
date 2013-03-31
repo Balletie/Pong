@@ -12,7 +12,7 @@ public class Audio extends Pong{
 	}
 	
 	public void backgroundMusic(Music background_music) {
-		background_music.setVolume(0.7f);
+		background_music.setVolume(0.5f);
 		background_music.setLooping(true);
 		background_music.play();
 	}

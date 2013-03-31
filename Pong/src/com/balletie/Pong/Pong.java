@@ -7,9 +7,9 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.FPSLogger;
 import com.badlogic.gdx.graphics.GL10;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.*;
 
 public class Pong implements ApplicationListener {
@@ -20,7 +20,8 @@ public class Pong implements ApplicationListener {
 	protected About aboutScreen;
 	private Ball ball = new Ball();
 	private Paddle paddle1 = new Paddle(), paddle2 = new Paddle();
-	private ShapeRenderer shapeRenderer;
+	private Texture ballTex;
+	private Texture paddleTex;
 	private FPSLogger fpsLogger;
 	public float fieldTop, fieldBottom, fieldRight, fieldLeft;
 	public BitmapFont white;
@@ -66,12 +67,13 @@ public class Pong implements ApplicationListener {
 		fieldBottom = field.y;
 		fieldTop = field.y + field.height;
 		
-		shapeRenderer = new ShapeRenderer();
 		spriteBatch = new SpriteBatch();
 		white = new BitmapFont(Gdx.files.internal("data/pongfont.fnt"), Gdx.files.internal("data/pongfont.png"), false);
 		background_music = Gdx.audio.newMusic(Gdx.files.internal("data/Seablue_-_02_-_Aurora_Dawn.mp3"));
 		ball_bump = Gdx.audio.newSound(Gdx.files.internal("data/ball_bump.wav"));
 		ball_score = Gdx.audio.newSound(Gdx.files.internal("data/ball_score.wav"));
+		ballTex = new Texture(Gdx.files.internal("data/ball.png"));
+		paddleTex = new Texture(Gdx.files.internal("data/paddle.png"));
 		soundOfMusic = new Audio(ball_bump, ball_bump, background_music);
 		soundOfMusic.backgroundMusic(background_music);
 		mainMenu = new Menu(spriteBatch, white, field, currentMenu);
@@ -87,13 +89,14 @@ public class Pong implements ApplicationListener {
 		ball_bump.dispose();
 		ball_score.dispose();
 		white.dispose();
+		ballTex.dispose();
+		paddleTex.dispose();
 		spriteBatch.dispose();
-		shapeRenderer.dispose();
 	}
 
 	@Override
 	public void render() {		
-		float dt = Gdx.graphics.getDeltaTime();
+		float dt = Gdx.graphics.getRawDeltaTime();
 		if(mainMenu.about(currentMenu) == MenuSwitch.ABOUT){
 			currentMenu = MenuSwitch.ABOUT;
 		} else if(mainMenu.newGame(currentMenu) == MenuSwitch.PLAY){
@@ -112,7 +115,7 @@ public class Pong implements ApplicationListener {
 			Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
 			Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 			update(dt);
-			draw(dt);
+			draw();
 			fpsLogger.log();
 			break;
 		case ABOUT:
@@ -134,7 +137,6 @@ public class Pong implements ApplicationListener {
 	@Override
 	public void resume() {
 	}
-// Methods
 	
 	public float textCor(float textCorrect){
 		if(Player1 > 9){
@@ -148,7 +150,7 @@ public class Pong implements ApplicationListener {
 		return textCorrect;
 	}
 	
-	private void draw(float dt){
+	private void draw(){
 		
 		CharSequence cPlayer1 = String.valueOf(Player1);
 		CharSequence cPlayer2 = String.valueOf(Player2);
@@ -158,21 +160,10 @@ public class Pong implements ApplicationListener {
 			white.setScale(2, 2);
 			white.draw(spriteBatch, cPlayer1, (field.width / 2) - textCor(textCorrect), field.height - 50f);
 			white.draw(spriteBatch, cPlayer2, (field.width / 2) + 52, field.height - 50f);
-		spriteBatch.end();
-		
-		shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-			drawBall(dt);
-			drawPaddle(dt);
-		shapeRenderer.end();	
-	}
-	
-	private void drawBall (float dt){
-		shapeRenderer.rect(ball.getX(), ball.getY(), ball.getWidth(), ball.getHeight());
-	}
-	
-	private void drawPaddle (float dt) {
-		shapeRenderer.rect(paddle1.getX(), paddle1.getY(), paddle1.getWidth(), paddle1.getHeight());
-		shapeRenderer.rect(paddle2.getX(), paddle2.getY(), paddle2.getWidth(), paddle2.getHeight());
+			spriteBatch.draw(ballTex, ball.getX(), ball.getY());
+			spriteBatch.draw(paddleTex, paddle1.getX(), paddle1.getY());
+			spriteBatch.draw(paddleTex, paddle2.getX(), paddle2.getY());
+		spriteBatch.end();	
 	}
 	
 	private void update(float dt){
@@ -378,9 +369,7 @@ public class Pong implements ApplicationListener {
 		reset();
 	}
 	
-// Reset various things (initial ball position, initial ball velocity, initial paddle position)
 	public void reset() {
-		//Reset Ball
 		currentVelocity = initVelocity;
 		ball.move((field.x + (field.width - ball.getWidth())) / 2, field.y + (field.height - ball.getHeight()) / 2);
 		Vector2 velocity = ball.getVelocity();
@@ -388,7 +377,6 @@ public class Pong implements ApplicationListener {
 		velocity.setAngle(0f);
 		ball.setVelocity(velocity);
 		
-		//Reset Paddles
 		paddle1.move(field.x + (field.width * .1f), field.y + (field.height - paddle1.getHeight()) / 2);
 		paddle2.move(field.x + field.width - (field.width * .1f) - paddle1.getWidth(), field.y + (field.height - paddle2.getHeight()) / 2);
 	}
